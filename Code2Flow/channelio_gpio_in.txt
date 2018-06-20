@@ -9,3 +9,20 @@ char channelio_gpio_in(TDeviceChannel *channel, char port12) {
 
   return 0;
 }
+
+
+ y = f(x) = sqrt(x) ; // y-->return result / x-->argument / sqrt mathematical operation.
+ 
+ --channel input  output gpio fucntion +++
+ in this fucntion section Code and section Stack are the memory for it's vars
+ return char (1 byte | 8bits), {return 1 true | 0 false}
+ arguments : 
+ 1-device type channel struct(TDeviceChannel *channel)
+ 2-char
+ 
+ the if statement  : is a logical operation (like sqrt in math)
+
+in porto.h SENSORNO : no:normally open/nc:normally connected
+
+
+ 
