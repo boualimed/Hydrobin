@@ -1,0 +1,45 @@
+char channelio_init(void) {
+  cio = malloc(sizeof(TChannelIo));
+  if (cio == NULL) return 0;
+
+  memset(cio, 0, sizeof(TChannelIo));
+  cio->cb_lck = lck_init();
+  cio->wl_lck = lck_init();
+
+#ifndef __SINGLE_THREAD
+  cio->gpio_thread_arr = safe_array_init();
+#endif
+
+  return 1;
+}
+
+return char (1byte) 0 true / 1 false 
+
+TChannelIo *cio = NULL;// is a null pointer point to TChannelIo
+
+cio : memory allocation pointer at the heap section __ sizeof__ TchannelIO_struct_it must reserved
+
+space. and pointer String points to the first byte for the nbytes reserved.
+
+exit when cio == null 
+
+continue if none 
+memset: 
+calling memset(used to fill a block of memory with a particular value.), 
+// ptr ==> Starting address of memory to be filled //cio
+// x   ==> Value to be filled                     //0
+// n   ==> Number of bytes to be filled starting //sizeof tchannelio
+//         from ptr to be filled(cio points to the fisrt address byte)
+
+then 
+cb_lck and wl_lck are two void pointers(void pointer can hold address of any type and can be typcasted to any type.)
+calling lck_init() fucntion
+if !=single thread
+gpio_thread_arr is void pointer also andis assigned to safe_array_init() function. 
+
+Conlusion 
+
+ 
+
+
+
