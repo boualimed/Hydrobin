@@ -1,0 +1,11 @@
+char channelio_gpio_in(TDeviceChannel *channel, char port12) {
+  if (channel->type == SUPLA_CHANNELTYPE_SENSORNO ||
+      channel->type == SUPLA_CHANNELTYPE_SENSORNC ||
+      ((channel->type == SUPLA_CHANNELTYPE_RELAYHFD4 ||
+        channel->type == SUPLA_CHANNELTYPE_RELAYG5LA1A ||
+        channel->type == SUPLA_CHANNELTYPE_RELAYG5LA1A) &&
+       port12 == 2 && channel->bistable == 1))
+    return 1;
+
+  return 0;
+}
