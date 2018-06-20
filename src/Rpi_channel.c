@@ -179,8 +179,59 @@ char channelio_init(void) {
   return 1;
 }
 
+// 
 
+void channelio_free(void) {
+  int a;
+  if (cio) {
+#ifndef __SINGLE_THREAD
+    // 1st stop threads!!!
 
+    if (cio->w1_sthread) sthread_twf(cio->w1_sthread);
+
+    if (cio->mcp_sthread) sthread_twf(cio->mcp_sthread);
+
+    while (safe_array_count(cio->gpio_thread_arr) > 0) {
+      safe_array_lock(cio->gpio_thread_arr);
+      TGpioThreadItem *gti = safe_array_get(cio->gpio_thread_arr, 0);
+
+      if (gti && gti->sthread) sthread_terminate(gti->sthread);
+
+      safe_array_unlock(cio->gpio_thread_arr);
+
+      usleep(100);
+    }
+
+    safe_array_free(cio->gpio_thread_arr);
+
+#endif
+
+    for (a = 0; a < cio->channel_count; a++) {
+      if (cio->channels[a].w1 != NULL) free(cio->channels[a].w1);
+
+      if (channelio_gpio_in(&cio->channels[a], 1) == 0) {
+        if (cio->channels[a].gpio1 > 0)
+          gpio_set_value(cio->channels[a].gpio1, 0);
+
+        if (cio->channels[a].gpio2 > 0)
+          gpio_set_value(cio->channels[a].gpio2, 0);
+      }
+
+      lck_free(cio->channels[a].gpio1_value.lck);
+      lck_free(cio->channels[a].gpio2_value.lck);
+    }
+
+    if (cio->channels) free(cio->channels);
+
+    if (cio->watch_list) free(cio->watch_list);
+
+    lck_free(cio->wl_lck);
+    lck_free(cio->cb_lck);
+
+    free(cio);
+    cio = NULL;
+  }
+}
 
 
 
