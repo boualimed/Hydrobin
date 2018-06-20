@@ -162,6 +162,22 @@ char channelio_gpio_in(TDeviceChannel *channel, char port12) {
 
   return 0;
 }
+//
+
+char channelio_init(void) {
+  cio = malloc(sizeof(TChannelIo));
+  if (cio == NULL) return 0;
+
+  memset(cio, 0, sizeof(TChannelIo));
+  cio->cb_lck = lck_init();
+  cio->wl_lck = lck_init();
+
+#ifndef __SINGLE_THREAD
+  cio->gpio_thread_arr = safe_array_init();
+#endif
+
+  return 1;
+}
 
 
 
