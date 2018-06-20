@@ -1,0 +1,56 @@
+void channelio_free(void) {
+  int a;
+  if (cio) {/*implicitly conversion from int to bool non-zero-->true, zero-->false  */
+#ifndef __SINGLE_THREAD
+    // 1st stop threads!!!
+    /*Classical UNIX programs have a single
+thread of execution: the CPU processes instructions for a single logical flow of execution
+through the program. In a multithreaded program, there are multiple, independent,
+concurrent logical flows of execution within the same process.*/
+
+    //w1_sthread void pointer 
+    if (cio->w1_sthread) sthread_twf(cio->w1_sthread); //single thread terminate-wait-free
+    //mcp_sthread void pointer 
+    if (cio->mcp_sthread) sthread_twf(cio->mcp_sthread);
+
+    while (safe_array_count(cio->gpio_thread_arr) > 0) {
+      safe_array_lock(cio->gpio_thread_arr);
+      TGpioThreadItem *gti = safe_array_get(cio->gpio_thread_arr, 0);
+
+      if (gti && gti->sthread) sthread_terminate(gti->sthread);
+
+      safe_array_unlock(cio->gpio_thread_arr);
+
+      usleep(100);
+    }
+
+    safe_array_free(cio->gpio_thread_arr);
+
+#endif
+
+    for (a = 0; a < cio->channel_count; a++) {
+      if (cio->channels[a].w1 != NULL) free(cio->channels[a].w1);
+
+      if (channelio_gpio_in(&cio->channels[a], 1) == 0) {
+        if (cio->channels[a].gpio1 > 0)
+          gpio_set_value(cio->channels[a].gpio1, 0);
+
+        if (cio->channels[a].gpio2 > 0)
+          gpio_set_value(cio->channels[a].gpio2, 0);
+      }
+
+      lck_free(cio->channels[a].gpio1_value.lck);
+      lck_free(cio->channels[a].gpio2_value.lck);
+    }
+
+    if (cio->channels) free(cio->channels);
+
+    if (cio->watch_list) free(cio->watch_list);
+
+    lck_free(cio->wl_lck);
+    lck_free(cio->cb_lck);
+
+    free(cio);
+    cio = NULL;
+  }
+}
